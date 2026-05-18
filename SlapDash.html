@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SlapDash — Slap your MacBook. It screams back.</title>
+<link rel="icon" type="image/png" href="./slapdashicon.png" />
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500&f[]=satoshi@900,700,500,400&f[]=jetbrains-mono@500,400&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f3ef;
+    --bg-2: #ede9e3;
+    --surface: #ffffff;
+    --ink: #1a1614;
+    --ink-2: #4a4540;
+    --ink-3: #87807a;
+    --line: rgba(26, 22, 20, 0.10);
+    --line-strong: rgba(26, 22, 20, 0.18);
+    --pink: #f06292;
+    --red:  #e8345a;
+    --grad: linear-gradient(135deg, #f06292 0%, #e8345a 100%);
+    --grad-soft: linear-gradient(135deg, rgba(240,98,146,.14), rgba(232,52,90,.14));
+    --shadow-lg: 0 30px 60px -20px rgba(232, 52, 90, 0.35), 0 18px 30px -16px rgba(26,22,20,.15);
+    --shadow-card: 0 1px 0 rgba(26,22,20,.04), 0 12px 24px -16px rgba(26,22,20,.18);
+    --radius-sm: 10px;
+    --radius: 16px;
+    --radius-lg: 22px;
+    --radius-xl: 30px;
+    --maxw: 1180px;
+    --pad: clamp(20px, 4vw, 40px);
+  }
+  html[data-theme="dark"] {
+    --bg: #1a1614;
+    --bg-2: #221c1a;
+    --surface: #221c1a;
+    --ink: #f5f3ef;
+    --ink-2: #cdc4bd;
+    --ink-3: #8c827b;
+    --line: rgba(245, 243, 239, 0.10);
+    --line-strong: rgba(245, 243, 239, 0.18);
+    --shadow-lg: 0 30px 60px -20px rgba(232, 52, 90, 0.45), 0 18px 30px -16px rgba(0,0,0,.4);
+    --shadow-card: 0 1px 0 rgba(245,243,239,.03), 0 12px 24px -16px rgba(0,0,0,.5);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Satoshi', system-ui, -apple-system, sans-serif;
+    font-weight: 500;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    transition: background-color .3s ease, color .3s ease;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: .5;
+    background-image: radial-gradient(rgba(26,22,20,.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  html[data-theme="dark"] body::before {
+    background-image: radial-gradient(rgba(245,243,239,.04) 1px, transparent 1px);
+  }
+  h1,h2,h3,h4 { font-family: 'Cabinet Grotesk', 'Satoshi', system-ui, sans-serif; font-weight: 800; letter-spacing: -.02em; margin: 0; color: var(--ink); }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--red); color: #fff; }
+
+  /* ===== Reusable ===== */
+  .container { max-width: var(--maxw); margin: 0 auto; padding-left: var(--pad); padding-right: var(--pad); position: relative; z-index: 1; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .eyebrow::before { content: ''; width: 22px; height: 1px; background: var(--ink-3); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 22px; border-radius: 999px; font-weight: 700;
+    font-family: 'Satoshi', sans-serif; font-size: 15px;
+    border: 1px solid transparent; cursor: pointer;
+    transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+    white-space: nowrap;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary {
+    color: #fff;
+    background: var(--grad);
+    box-shadow: 0 10px 24px -10px rgba(232,52,90,.6), inset 0 1px 0 rgba(255,255,255,.25);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 32px -12px rgba(232,52,90,.7), inset 0 1px 0 rgba(255,255,255,.3); }
+  .btn-ghost {
+    color: var(--ink);
+    background: transparent;
+    border-color: var(--line-strong);
+  }
+  .btn-ghost:hover { background: var(--bg-2); }
+  .btn-lg { padding: 18px 30px; font-size: 17px; border-radius: 999px; }
+
+  /* ===== Logo ===== */
+  .sd-logo { display: inline-flex; align-items: center; gap: 12px; }
+  .sd-mark { width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0; overflow: hidden; padding: 0; }
+  .sd-mark svg { width: 60%; height: 60%; display: block; }
+  .sd-word { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -.02em; }
+
+  /* ===== Nav ===== */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    transition: background .3s ease, border-color .3s ease, backdrop-filter .3s ease;
+    border-bottom: 1px solid transparent;
+  }
+  .nav.scrolled {
+    background: color-mix(in oklab, var(--bg) 75%, transparent);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom-color: var(--line);
+  }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .theme-toggle {
+    width: 40px; height: 40px; border-radius: 999px;
+    border: 1px solid var(--line-strong); background: transparent;
+    display: grid; place-items: center; cursor: pointer; color: var(--ink);
+    transition: background .2s ease, transform .15s ease;
+  }
+  .theme-toggle:hover { background: var(--bg-2); }
+  .theme-toggle svg { width: 18px; height: 18px; }
+  html[data-theme="light"] .icon-moon { display: block; }
+  html[data-theme="light"] .icon-sun { display: none; }
+  html[data-theme="dark"] .icon-moon { display: none; }
+  html[data-theme="dark"] .icon-sun { display: block; }
+
+  /* ===== Hero ===== */
+  .hero { padding: clamp(40px, 7vw, 90px) 0 clamp(60px, 10vw, 120px); position: relative; }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(30px, 5vw, 60px);
+    align-items: center;
+  }
+  .ph-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 14px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--line-strong);
+    font-family: 'Satoshi', sans-serif; font-weight: 700; font-size: 13px;
+    box-shadow: var(--shadow-card);
+  }
+  .ph-badge .trophy { font-size: 16px; line-height: 1; }
+  .ph-badge .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--ink-3); }
+  .ph-badge .muted { color: var(--ink-3); font-weight: 500; }
+
+  .hero h1 {
+    font-size: clamp(44px, 7vw, 88px);
+    line-height: .96; margin-top: 24px;
+    text-wrap: balance;
+  }
+  .hero h1 .grad {
+    background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero-sub { margin-top: 20px; font-size: clamp(18px, 2vw, 22px); color: var(--ink-2); max-width: 32ch; }
+  .hero-ctas { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; }
+  .hero-tags {
+    margin-top: 22px; display: flex; flex-wrap: wrap; gap: 8px 14px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-3);
+  }
+  .hero-tags span { display: inline-flex; align-items: center; gap: 8px; }
+  .hero-tags span + span::before { content: '·'; margin-right: 6px; color: var(--line-strong); }
+
+  /* Hero illustration */
+  .hero-art {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    max-width: 520px;
+    margin-left: auto;
+  }
+  .hero-art svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  @keyframes shake {
+    0%, 100% { transform: translate(0,0) rotate(-2deg); }
+    20% { transform: translate(-4px, 2px) rotate(-3.5deg); }
+    40% { transform: translate(5px, -3px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(-2.5deg); }
+    80% { transform: translate(4px, 2px) rotate(-1.5deg); }
+  }
+  .hero-art .laptop-grp { transform-origin: center; animation: shake 1.6s ease-in-out infinite; }
+  @keyframes float-hand {
+    0%, 100% { transform: translate(0, 0) rotate(8deg); }
+    50% { transform: translate(-6px, -8px) rotate(6deg); }
+  }
+  .hero-art .hand-grp { transform-origin: center; animation: float-hand 2.4s ease-in-out infinite; }
+
+  /* ===== Sections common ===== */
+  section { position: relative; z-index: 1; }
+  .section { padding: clamp(70px, 10vw, 130px) 0; }
+  .section-head { max-width: 720px; margin-bottom: clamp(40px, 5vw, 70px); }
+  .section-head h2 { font-size: clamp(36px, 5vw, 60px); line-height: 1; text-wrap: balance; margin-top: 14px; }
+  .section-head p { margin-top: 18px; font-size: clamp(16px, 1.6vw, 19px); color: var(--ink-2); max-width: 56ch; }
+
+  /* ===== Social proof ===== */
+  .social { background: var(--bg-2); }
+  .social-scroll {
+    display: flex; gap: 18px; overflow-x: auto; padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    margin-left: calc(-1 * var(--pad)); padding-left: var(--pad); padding-right: var(--pad);
+  }
+  .social-scroll::-webkit-scrollbar { height: 6px; }
+  .social-scroll::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; }
+  .social-card {
+    flex: 0 0 280px; scroll-snap-align: start;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-card);
+    display: flex; flex-direction: column; gap: 12px;
+    filter: blur(.4px);
+  }
+  .sc-head { display: flex; align-items: center; gap: 10px; }
+  .sc-avatar { width: 36px; height: 36px; border-radius: 999px; background: linear-gradient(135deg, #ddd, #aaa); }
+  html[data-theme="dark"] .sc-avatar { background: linear-gradient(135deg, #3a3330, #1f1a18); }
+  .sc-name { font-weight: 700; font-size: 14px; }
+  .sc-handle { font-size: 12px; color: var(--ink-3); }
+  .sc-body { font-size: 13px; color: var(--ink-2); line-height: 1.45;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .sc-stats { display: flex; gap: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-3); margin-top: auto; }
+  .sc-stats b { color: var(--ink); font-weight: 700; margin-right: 4px; }
+  .sc-platform {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase; letter-spacing: .08em;
+    background: var(--grad-soft); color: var(--red);
+    padding: 4px 8px; border-radius: 999px;
+  }
+
+  /* ===== Menu bar visual ===== */
+  .menubar-stage {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-xl); padding: clamp(20px, 3vw, 32px);
+    box-shadow: var(--shadow-card);
+    position: relative; overflow: visible;
+  }
+  .menubar-stage::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at top right, rgba(240,98,146,.10), transparent 60%);
+    pointer-events: none;
+  }
+  .menubar {
+    background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.7));
+    border: 1px solid var(--line-strong);
+    border-radius: 12px;
+    height: 30px;
+    display: flex; align-items: center;
+    padding: 0 12px; gap: 14px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 24px -10px rgba(0,0,0,.18);
+    color: #1a1614;
+    font-family: -apple-system, system-ui, sans-serif;
+    font-size: 13px;
+    position: relative; z-index: 2;
+    overflow: visible;
+    min-width: 0;
+  }
+  html[data-theme="dark"] .menubar {
+    background: linear-gradient(180deg, rgba(40,32,30,.85), rgba(28,22,20,.7));
+    color: #f5f3ef;
+  }
+  .menubar .apple { width: 12px; height: 14px; display: grid; place-items: center; opacity: .85; }
+  .menubar .apple svg { width: 12px; height: 14px; }
+  .menubar .app-name { font-weight: 600; }
+  .menubar .menus { display: flex; gap: 14px; opacity: .85; }
+  .menubar .spacer { flex: 1; min-width: 0; }
+  .menubar .tray {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.85;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: visible;
+    position: relative;
+  }
+  .menubar .tray .tray-icon { width: 14px; height: 14px; opacity: .6; }
+  .menubar .tray-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    opacity: 0.85;
+    white-space: nowrap;
+  }
+  .menubar .slapdash-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 0 0 2px rgba(232,52,90,.18);
+    animation: pulse-glow 2s ease-in-out infinite;
+    overflow: hidden;
+    padding: 0;
+    background: none;
+  }
+  .menubar .slapdash-icon svg { width: 70%; height: 70%; }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(232,52,90,.4); }
+    50% { box-shadow: 0 0 0 6px rgba(232,52,90,0); }
+  }
+  .desktop-wallpaper {
+    margin-top: 0;
+    height: 160px;
+    background: linear-gradient(135deg, #5a3a5e, #c44e6b 50%, #f06292);
+    border-radius: 0 0 12px 12px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .desktop-wallpaper::after {
+    content: 'click the hand →'; position: absolute; bottom: 14px; left: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,.75);
+  }
+  .menubar-explainer { margin-top: 20px; color: var(--ink-3); font-size: 14px; font-family: 'JetBrains Mono', monospace; }
+  .menubar .slapdash-icon-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    overflow: visible;
+  }
+
+  .menubar-arrow {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(calc(-100% + 4px));
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--red);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 999;
+    line-height: 1;
+  }
+
+  /* ===== Feelings layout ===== */
+  .feelings-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(30px, 5vw, 60px); align-items: center; }
+  .feelings-grid .copy h2 { font-size: clamp(36px, 5vw, 60px); line-height: 1; }
+  .feelings-grid .copy p { margin-top: 18px; font-size: clamp(16px, 1.6vw, 19px); color: var(--ink-2); max-width: 48ch; }
+
+  /* ===== Features ===== */
+  .features-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  }
+  .feature {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+    display: flex; gap: 18px; align-items: flex-start;
+    transition: transform .25s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .feature:hover { transform: translateY(-2px); border-color: var(--line-strong); box-shadow: var(--shadow-card); }
+  .feature-icon {
+    flex-shrink: 0;
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--grad-soft); color: var(--red);
+    display: grid; place-items: center;
+  }
+  .feature-icon svg { width: 22px; height: 22px; }
+  .feature h3 { font-family: 'Cabinet Grotesk', sans-serif; font-size: 19px; font-weight: 700; }
+  .feature p { margin-top: 6px; color: var(--ink-2); font-size: 15px; line-height: 1.5; }
+  .coming-soon {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--grad-soft);
+    color: var(--red);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  /* ===== Sliders ===== */
+  .dial-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+    padding: clamp(28px, 4vw, 44px);
+    box-shadow: var(--shadow-card);
+  }
+  .dial { display: flex; flex-direction: column; gap: 16px; }
+  .dial-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .dial-head .label { font-family: 'Cabinet Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
+  .dial-head .value {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    color: #fff; padding: 4px 10px; border-radius: 999px;
+    background: var(--grad);
+  }
+  .range-wrap { position: relative; padding: 6px 0; }
+  input[type=range].sd-range {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 8px; border-radius: 999px;
+    background: var(--bg-2);
+    outline: none; cursor: pointer;
+  }
+  input[type=range].sd-range::-webkit-slider-runnable-track {
+    height: 8px; border-radius: 999px;
+    background: linear-gradient(to right, var(--pink) 0%, var(--red) var(--progress, 50%), var(--bg-2) var(--progress, 50%));
+  }
+  input[type=range].sd-range::-moz-range-track {
+    height: 8px; border-radius: 999px; background: var(--bg-2);
+  }
+  input[type=range].sd-range::-moz-range-progress {
+    height: 8px; border-radius: 999px; background: var(--grad);
+  }
+  input[type=range].sd-range::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #fff; border: 3px solid var(--red);
+    margin-top: -8px;
+    box-shadow: 0 4px 12px rgba(232,52,90,.4);
+    cursor: grab;
+  }
+  input[type=range].sd-range::-moz-range-thumb {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #fff; border: 3px solid var(--red);
+    box-shadow: 0 4px 12px rgba(232,52,90,.4); cursor: grab;
+  }
+  .range-labels { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-3); }
+
+  /* ===== Sound packs ===== */
+  .sound-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  .sound-card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 22px;
+    display: flex; flex-direction: column; gap: 8px;
+    transition: transform .2s ease, border-color .2s ease;
+    position: relative; overflow: hidden;
+  }
+  .sound-card::before {
+    content: ''; position: absolute; top: -40px; right: -40px; width: 100px; height: 100px;
+    background: var(--grad); opacity: 0; transition: opacity .25s ease;
+    border-radius: 50%; filter: blur(40px);
+  }
+  .sound-card:hover { transform: translateY(-3px); border-color: var(--line-strong); }
+  .sound-card:hover::before { opacity: .25; }
+  .sound-emoji { font-size: 32px; line-height: 1; position: relative; z-index: 1; }
+  .sound-name { font-family: 'Cabinet Grotesk', sans-serif; font-size: 22px; font-weight: 700; position: relative; z-index: 1; }
+  .sound-desc { color: var(--ink-3); font-size: 13px; position: relative; z-index: 1; }
+
+  /* ===== Roadmap ===== */
+  .roadmap-wrap { display: grid; grid-template-columns: 1.5fr 1fr; gap: clamp(30px, 4vw, 50px); align-items: start; }
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 9px; top: 8px; bottom: 8px; width: 2px;
+    background: linear-gradient(180deg, var(--pink), var(--red) 50%, var(--line));
+    border-radius: 2px;
+  }
+  .tl-item { position: relative; padding-bottom: 32px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-dot {
+    position: absolute; left: -27px; top: 4px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--red);
+    display: grid; place-items: center;
+    font-size: 11px;
+  }
+  .tl-item.done .tl-dot { background: var(--grad); border-color: transparent; color: #fff; }
+  .tl-item.locked .tl-dot { background: var(--bg-2); border-color: var(--line-strong); color: var(--ink-3); }
+  .tl-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; }
+  .tl-title { font-family: 'Cabinet Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
+  .tl-meta {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .08em;
+    padding: 3px 9px; border-radius: 999px;
+    background: var(--grad-soft); color: var(--red);
+  }
+  .tl-item.locked .tl-meta { background: var(--bg-2); color: var(--ink-3); }
+  .tl-desc { margin-top: 6px; color: var(--ink-2); max-width: 50ch; }
+
+  .past-releases {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 22px;
+    box-shadow: var(--shadow-card);
+  }
+  .past-releases h4 { font-family: 'Cabinet Grotesk', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+  .past-releases ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+  .past-releases li { display: grid; grid-template-columns: 60px 1fr; gap: 12px; align-items: baseline; }
+  .past-releases .ver { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--red); }
+  .past-releases .desc { color: var(--ink-2); }
+
+  /* ===== Nerdy / Collapsibles ===== */
+  details.collapse {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color .2s ease;
+  }
+  details.collapse + details.collapse { margin-top: 12px; }
+  details.collapse[open] { border-color: var(--line-strong); }
+  details.collapse > summary {
+    list-style: none; cursor: pointer; padding: 22px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    font-family: 'Cabinet Grotesk', sans-serif; font-size: 19px; font-weight: 700;
+  }
+  details.collapse > summary::-webkit-details-marker { display: none; }
+  .chev { width: 22px; height: 22px; flex-shrink: 0; transition: transform .25s ease; color: var(--ink-3); }
+  details.collapse[open] .chev { transform: rotate(180deg); color: var(--red); }
+  .collapse-body { padding: 0 24px 24px; }
+  details.collapse[open] .collapse-body { animation: slideDown .25s ease; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .nerdy-head h3 { font-family: 'Cabinet Grotesk', sans-serif; font-size: 26px; font-weight: 800; }
+  .nerdy-head p { color: var(--ink-2); margin-top: 8px; }
+  .algo-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    margin-top: 22px;
+  }
+  .algo {
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 14px; padding: 18px;
+  }
+  .algo h4 { font-family: 'Cabinet Grotesk', sans-serif; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .algo h4 .pill {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .08em;
+    color: #fff; background: var(--grad); padding: 2px 7px; border-radius: 999px;
+  }
+  .algo p { color: var(--ink-2); margin-top: 6px; font-size: 14px; }
+  .algo-foot {
+    margin-top: 18px; text-align: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-3);
+  }
+  .algo-foot b { color: var(--red); }
+
+  .code-block {
+    margin-top: 24px;
+    background: #1a1614; color: #f5f3ef;
+    border: 1px solid #2d2724; border-radius: 14px;
+    overflow: hidden;
+  }
+  html[data-theme="dark"] .code-block { background: #0e0a08; border-color: #2a221f; }
+  .code-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; background: rgba(255,255,255,.04);
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8c827b;
+  }
+  .code-bar .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .code-bar .dot:nth-child(1){background:#ff5f56}
+  .code-bar .dot:nth-child(2){background:#ffbd2e}
+  .code-bar .dot:nth-child(3){background:#27c93f}
+  .code-bar .file { margin-left: 10px; }
+  pre.code {
+    margin: 0; padding: 18px 20px;
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.65;
+    overflow-x: auto;
+  }
+  .code-key { color: #f06292; }
+  .code-cls { color: #ffd166; }
+  .code-cmt { color: #6b665f; }
+  .code-str { color: #b5e853; }
+  .code-fn  { color: #6cc6ff; }
+
+  /* ===== Pricing ===== */
+  .pricing-band {
+    background: var(--grad);
+    color: #fff;
+    border-radius: var(--radius-xl);
+    padding: clamp(40px, 6vw, 80px) clamp(28px, 5vw, 60px);
+    text-align: center;
+    position: relative; overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+  .pricing-band::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at top, rgba(255,255,255,.25), transparent 50%);
+    pointer-events: none;
+  }
+  .pricing-banner {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.3);
+    padding: 8px 16px; border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    backdrop-filter: blur(10px);
+    position: relative; z-index: 1;
+  }
+  .pricing-banner a { text-decoration: underline; text-underline-offset: 3px; opacity: .9; }
+  .pricing-band h2 {
+    color: #fff; font-size: clamp(34px, 5vw, 60px); line-height: 1.04;
+    margin-top: 22px; max-width: 18ch; margin-inline: auto; text-wrap: balance;
+    position: relative; z-index: 1;
+  }
+  .pricing-sub { margin-top: 18px; opacity: .92; font-size: clamp(15px, 1.6vw, 18px); position: relative; z-index: 1; max-width: 50ch; margin-inline: auto; }
+  .pricing-cta { margin-top: 32px; position: relative; z-index: 1; display: inline-flex; }
+  .pricing-cta .btn {
+    background: #fff; color: var(--red);
+    box-shadow: 0 12px 30px -10px rgba(0,0,0,.4);
+  }
+  .pricing-cta .btn:hover { background: #1a1614; color: #fff; }
+  /* Apple logo: black by default, turns white on hover */
+  .pricing-cta .pricing-apple-icon {
+    transition: filter 0.2s ease;
+    filter: brightness(0);
+  }
+  .pricing-cta .btn:hover .pricing-apple-icon {
+    filter: brightness(0) invert(1);
+  }
+  .pricing-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+  }
+  .pricing-close:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.08);
+  }
+  .pricing-close:active {
+    transform: scale(0.95);
+  }
+
+  /* ===== FAQ ===== */
+  .faq-list { max-width: 820px; margin: 0 auto; }
+  details.faq-item {
+    border-bottom: 1px solid var(--line);
+    padding: 4px 0;
+  }
+  details.faq-item > summary {
+    list-style: none; cursor: pointer;
+    padding: 22px 4px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    font-family: 'Cabinet Grotesk', sans-serif; font-size: clamp(17px, 2vw, 21px); font-weight: 700;
+  }
+  details.faq-item > summary::-webkit-details-marker { display: none; }
+  details.faq-item .chev { color: var(--ink-3); }
+  details.faq-item[open] .chev { transform: rotate(180deg); color: var(--red); }
+  .faq-body {
+    padding: 0 4px 22px;
+    color: var(--ink-2); font-size: 16px; line-height: 1.6;
+    max-width: 64ch;
+  }
+  details.faq-item[open] .faq-body { animation: slideDown .25s ease; }
+
+  /* ===== Footer ===== */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 60px 0 40px;
+    background: var(--bg-2);
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; align-items: start; }
+  .footer-tag { color: var(--ink-3); margin-top: 14px; max-width: 36ch; font-size: 14px; }
+  .footer-links { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; }
+  .footer-links a { color: var(--ink-2); transition: color .15s ease; }
+  .footer-links a:hover { color: var(--red); }
+  .footer-bottom {
+    margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+    font-size: 13px; color: var(--ink-3);
+  }
+  .footer-bottom .built { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; }
+  .footer-bottom .built-link { color: var(--red); text-decoration: none; text-underline-offset: 3px; transition: text-decoration-color .15s ease; }
+  .footer-bottom .built-link:hover { text-decoration: underline; text-decoration-thickness: 1px; }
+  .footer-builtby { color: var(--ink-2); font-size: 14px; }
+  .footer-builtby a { color: var(--ink-2); transition: color .15s ease; }
+  .footer-builtby a:hover { color: var(--red); }
+
+  /* ===== Modal ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility .2s ease;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    padding: 32px;
+    max-width: 460px;
+    width: 100%;
+    position: relative;
+    box-shadow: var(--shadow-card);
+    transform: translateY(10px);
+    transition: transform .25s cubic-bezier(.2,.7,.2,1);
+    color: var(--ink);
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    width: 36px;
+    height: 36px;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--ink-3);
+    cursor: pointer;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    transition: color .15s ease, background .15s ease;
+  }
+  .modal-close:hover { color: var(--red); background: var(--grad-soft); }
+  .modal-title {
+    font-family: 'Cabinet Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--ink);
+    padding-right: 32px;
+  }
+  .modal-body {
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ===== Scroll reveals ===== */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  .reveal-stagger > * { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1); }
+  .reveal-stagger.in > * { opacity: 1; transform: translateY(0); }
+  .reveal-stagger.in > *:nth-child(1) { transition-delay: 0ms; }
+  .reveal-stagger.in > *:nth-child(2) { transition-delay: 60ms; }
+  .reveal-stagger.in > *:nth-child(3) { transition-delay: 120ms; }
+  .reveal-stagger.in > *:nth-child(4) { transition-delay: 180ms; }
+  .reveal-stagger.in > *:nth-child(5) { transition-delay: 240ms; }
+  .reveal-stagger.in > *:nth-child(6) { transition-delay: 300ms; }
+  .reveal-stagger.in > *:nth-child(7) { transition-delay: 360ms; }
+  .reveal-stagger.in > *:nth-child(8) { transition-delay: 420ms; }
+  .reveal-stagger.in > *:nth-child(9) { transition-delay: 480ms; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal-stagger > * { opacity: 1; transform: none; transition: none; }
+    .hero-art .laptop-grp, .hero-art .hand-grp, .menubar .slapdash-icon { animation: none; }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-art { max-width: 380px; margin: 10px auto 0; }
+    .feelings-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .dial-grid { grid-template-columns: 1fr; }
+    .sound-grid { grid-template-columns: repeat(2, 1fr); }
+    .roadmap-wrap { grid-template-columns: 1fr; }
+    .algo-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .sd-word { display: none; }
+    .nav .btn-primary { padding: 12px 16px; font-size: 13px; }
+  }
+  @media (max-width: 500px) {
+    .sound-grid { grid-template-columns: 1fr 1fr; }
+    .hero-ctas .btn { flex: 1; }
+    .ph-badge { font-size: 12px; padding: 7px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="container nav-inner">
+    <a href="#top" class="sd-logo" aria-label="SlapDash home">
+      <span class="sd-mark" aria-hidden="true">
+        <img src="./slapdashicon.png" width="36" height="36" alt="SlapDash logo" style="display:block; width:36px; height:36px; object-fit:contain;">
+      </span>
+      <span class="sd-word">SlapDash</span>
+    </a>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+      <a href="./Slapdash-1.0.0.dmg" download class="btn btn-primary">
+        <img src="./apple-512.png" width="18" height="18" alt="" style="display:block; filter: brightness(0) invert(1);">
+        Download for Mac — FREE
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-copy reveal">
+        <span class="ph-badge">
+          <span class="trophy">🏆</span>
+          <span><b>#1 Product of the Day</b></span>
+          <span class="dot"></span>
+          <span class="muted">Product Hunt</span>
+        </span>
+        <h1>Slap your MacBook.<br /><span class="grad">It screams back.</span></h1>
+        <p class="hero-sub">That's it. That's the app.</p>
+        <div class="hero-ctas">
+          <a href="./Slapdash-1.0.0.dmg" download class="btn btn-primary btn-lg">
+            <img src="./apple-512.png" width="18" height="18" alt="" style="display:block; filter: brightness(0) invert(1);">
+            Download for Mac
+          </a>
+          <a href="#feelings" class="btn btn-ghost btn-lg">See how it works <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="hero-tags">
+          <span>macOS 14.6+ (Sonoma)</span>
+          <span>M1PRO+ MacBook required</span>
+        </div>
+      </div>
+
+      <div class="hero-art reveal" aria-hidden="true">
+        <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g-pink" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f06292"/>
+              <stop offset="1" stop-color="#e8345a"/>
+            </linearGradient>
+            <linearGradient id="g-screen" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#2a2422"/>
+              <stop offset="1" stop-color="#181412"/>
+            </linearGradient>
+            <radialGradient id="g-shadow" cx=".5" cy=".5" r=".5">
+              <stop offset="0" stop-color="rgba(0,0,0,.35)"/>
+              <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+            </radialGradient>
+          </defs>
+
+          <!-- shadow -->
+          <ellipse cx="300" cy="510" rx="200" ry="20" fill="url(#g-shadow)"/>
+
+          <!-- LAPTOP -->
+          <g class="laptop-grp">
+            <!-- base -->
+            <rect x="80" y="430" width="440" height="22" rx="6" fill="#cbc3bc"/>
+            <rect x="80" y="430" width="440" height="8"  rx="4" fill="#a59c95"/>
+            <rect x="260" y="430" width="80" height="6" rx="3" fill="#7b7269"/>
+
+            <!-- screen body -->
+            <rect x="100" y="170" width="400" height="270" rx="14" fill="#d8d2cc"/>
+            <rect x="112" y="182" width="376" height="246" rx="6" fill="url(#g-screen)"/>
+
+            <!-- screen chrome bar -->
+            <rect x="120" y="190" width="360" height="14" rx="3" fill="#3a2e2c"/>
+            <circle cx="135" cy="197" r="3" fill="#ff5f56"/>
+            <circle cx="148" cy="197" r="3" fill="#ffbd2e"/>
+            <circle cx="161" cy="197" r="3" fill="#27c93f"/>
+
+            <!-- AHHH! on screen -->
+            <text x="300" y="320" text-anchor="middle"
+                  font-family="Cabinet Grotesk, system-ui, sans-serif"
+                  font-weight="800" font-size="74" fill="url(#g-pink)"
+                  letter-spacing="-2">AHHH!</text>
+            <text x="300" y="370" text-anchor="middle"
+                  font-family="JetBrains Mono, monospace"
+                  font-size="14" fill="#9c948c"
+                  letter-spacing="2">▮ vol 0.84  · 0.42g</text>
+
+            <!-- camera notch -->
+            <rect x="280" y="170" width="40" height="6" rx="3" fill="#2a2422"/>
+            <circle cx="300" cy="173" r="2" fill="#4a4540"/>
+          </g>
+
+          <!-- impact lines -->
+          <g stroke="url(#g-pink)" stroke-width="6" stroke-linecap="round" fill="none" opacity=".9">
+            <line x1="460" y1="120" x2="490" y2="100"/>
+            <line x1="430" y1="100" x2="445" y2="68"/>
+            <line x1="395" y1="100" x2="395" y2="60"/>
+            <line x1="500" y1="170" x2="540" y2="160"/>
+            <line x1="500" y1="220" x2="540" y2="230"/>
+          </g>
+
+          <!-- BIG HAND -->
+          <g class="hand-grp" transform="translate(310, 60)">
+            <g transform="rotate(8)">
+              <path d="M30 0c5 0 9 4 9 9v36h4V14c0-5 4-9 9-9s9 4 9 9v34h4V22c0-5 4-9 9-9s9 4 9 9v34h4V36c0-5 4-9 9-9s9 4 9 9v50c0 28-22 50-50 50h-4c-15 0-29-7-38-19l-29-37c-3-4-2-10 3-13s10-2 13 2l16 21c1 2 4 1 4-1V9c0-5 4-9 9-9z"
+                    fill="url(#g-pink)" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+              <ellipse cx="62" cy="92" rx="22" ry="34" fill="rgba(255,255,255,.18)"/>
+            </g>
+          </g>
+
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SOCIAL PROOF ============ -->
+<section class="section social">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">In the wild</span>
+      <h2>SlapDash went viral.<br />Like, everywhere.</h2>
+      <p>Featured on <b>500+ US radio stations</b>. Viral on Instagram, TikTok, and X. Millions of impressions. Thousands of slappers.</p>
+    </div>
+
+    <div class="social-scroll reveal-stagger">
+      <article class="social-card">
+        <div class="sc-head"><div class="sc-avatar"></div><div><div class="sc-name">drew_techreviews</div><div class="sc-handle">@drewreviews · TikTok</div></div></div>
+        <p class="sc-body">"i bought it. i slapped it. it screamed. perfect 5/7 app, no notes."</p>
+        <div class="sc-stats"><span class="sc-platform">TikTok</span><span><b>2.4M</b> views</span><span><b>198K</b> likes</span></div>
+      </article>
+      <article class="social-card">
+        <div class="sc-head"><div class="sc-avatar"></div><div><div class="sc-name">Mike on 102.7 FM</div><div class="sc-handle">Morning Drive · Phoenix</div></div></div>
+        <p class="sc-body">"We slapped the laptop on air for ten minutes straight. Phones lit up. Sales department called me."</p>
+        <div class="sc-stats"><span class="sc-platform">Radio</span><span><b>500+</b> stations</span></div>
+      </article>
+      <article class="social-card">
+        <div class="sc-head"><div class="sc-avatar"></div><div><div class="sc-name">verge_explainers</div><div class="sc-handle">@verge_ex · Instagram</div></div></div>
+        <p class="sc-body">"This $10 app uses 5 algorithms to detect when you slap your laptop. It's stupid. We can't stop."</p>
+        <div class="sc-stats"><span class="sc-platform">Instagram</span><span><b>1.1M</b> likes</span><span><b>42K</b> shares</span></div>
+      </article>
+      <article class="social-card">
+        <div class="sc-head"><div class="sc-avatar"></div><div><div class="sc-name">notreallyahacker</div><div class="sc-handle">@notreal · X</div></div></div>
+        <p class="sc-body">"my coworkers haven't said a word to me since i installed SlapDash. coincidence? probably not."</p>
+        <div class="sc-stats"><span class="sc-platform">X / Twitter</span><span><b>88K</b> reposts</span><span><b>410K</b> likes</span></div>
+      </article>
+      <article class="social-card">
+        <div class="sc-head"><div class="sc-avatar"></div><div><div class="sc-name">producthunt</div><div class="sc-handle">Featured launch · #1 of the day</div></div></div>
+        <p class="sc-body">"Cursed in the most delightful way. Founders, take notes — this is how you ship something people share."</p>
+        <div class="sc-stats"><span class="sc-platform">Product Hunt</span><span><b>1,820</b> upvotes</span></div>
+      </article>
+      <article class="social-card">
+        <div class="sc-head"><div class="sc-avatar"></div><div><div class="sc-name">slappers anonymous</div><div class="sc-handle">@slappersanon · Reddit</div></div></div>
+        <p class="sc-body">"day 14 of slapping my m1 max every time my pull request fails. it has become a coping mechanism."</p>
+        <div class="sc-stats"><span class="sc-platform">Reddit</span><span><b>34K</b> upvotes</span><span><b>1.2K</b> comments</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEELINGS ============ -->
+<section class="section" id="feelings">
+  <div class="container">
+    <div class="feelings-grid">
+      <div class="copy reveal">
+        <span class="eyebrow">Menu bar resident</span>
+        <h2>Your laptop has feelings now</h2>
+        <p>SlapDash hides in your menu bar. Slap your MacBook and it screams back, with volume <em>proportional to your force</em>. No dock icon. No window. Just consequences.</p>
+      </div>
+      <div class="menubar-stage reveal">
+        <div class="menubar">
+          <div class="apple" aria-hidden="true">
+            <svg viewBox="0 0 14 16" fill="currentColor"><path d="M11.6 8.5c0-2 1.6-3 1.7-3-.9-1.4-2.4-1.5-2.9-1.6-1.2-.1-2.4.7-3 .7s-1.6-.7-2.7-.7C3.4 4 2.1 4.7 1.4 5.9.2 8 .9 11.5 2.1 13.4c.6.9 1.3 2 2.2 2 .9 0 1.2-.6 2.3-.6s1.4.6 2.3.6c1 0 1.6-.9 2.2-1.9.7-1 .9-2 .9-2.1-.1 0-1.7-.6-1.7-2.4zM9.4 2.9c.5-.6.8-1.4.7-2.2-.7 0-1.5.4-2 1-.5.5-.8 1.4-.7 2.2.7 0 1.5-.4 2-1z"/></svg>
+          </div>
+          <span class="app-name">Finder</span>
+          <div class="menus"><span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span></div>
+          <span class="spacer"></span>
+          <div class="tray">
+            <span class="slapdash-icon-wrap">
+              <div class="menubar-arrow">that's me ↓</div>
+              <span class="slapdash-icon" title="SlapDash">
+                <img src="./slapdashicon.png" width="14" height="14" alt="SlapDash" style="display:block; object-fit:contain; border-radius:3px;">
+              </span>
+            </span>
+            <svg class="tray-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 6h16M4 12h16M4 18h10"/>
+            </svg>
+            <svg class="tray-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M5 6h14M5 18h14"/>
+            </svg>
+            <svg class="tray-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 9v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M9 9V5a3 3 0 1 1 6 0v4"/>
+            </svg>
+            <span>100%</span>
+            <span>9:41 AM</span>
+          </div>
+        </div>
+        <div class="desktop-wallpaper" aria-hidden="true"></div>
+        <p class="menubar-explainer">→ no dock icon. just a tiny hand judging your typing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="section" style="background:var(--bg-2);">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Feature dump</span>
+      <h2>Also, it does these things</h2>
+    </div>
+    <div class="features-grid reveal-stagger">
+
+      <div class="feature">
+        <span class="feature-icon"><i data-lucide="menu-square"></i></span>
+        <div><h3>Menu bar only</h3><p>No dock icon. No window. Lurks silently like a small angry pet.</p></div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><i data-lucide="volume-2"></i></span>
+        <div><h3>Volume scales with force</h3><p>Gentle tap? Whisper. Full slap? Full volume. Physics, but stupid.</p></div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><i data-lucide="sliders-horizontal"></i></span>
+        <div><h3>Adjustable sensitivity</h3><p>From "earthquake detector" to "needs a running start". You decide.</p></div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><i data-lucide="timer"></i></span>
+        <div><h3>Cooldown timer</h3><p>Prevents meltdowns during rapid slap sessions. Sound dignity preserved.</p></div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><i data-lucide="usb"></i></span>
+        <div><h3>USB Moaner</h3><span class="coming-soon">Coming Soon</span><p>Plug or unplug a USB device. It moans. You're welcome.</p></div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><i data-lucide="power"></i></span>
+        <div><h3>Launch at login</h3><p>Always ready. Always listening. Sleep with one eye open, Mac.</p></div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><i data-lucide="trophy"></i></span>
+        <div><h3>Slap counter</h3><p>Tracks your lifetime slaps. Global high score pending. Be ready.</p></div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><i data-lucide="party-popper"></i></span>
+        <div><h3>Onboarding</h3><p>A polite welcome flow before the chaos begins. We're not monsters.</p></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIAL IN ============ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Tuning panel</span>
+      <h2>Dial in your slap</h2>
+      <p>Two sliders. Two decisions. Set a vibe somewhere between "concerned librarian" and "ring announcer". This preview is decorative — the real ones live in the menu bar.</p>
+    </div>
+    <div class="dial-grid reveal">
+      <div class="dial">
+        <div class="dial-head">
+          <span class="label">Sensitivity</span>
+          <span class="value" id="sensVal">0.064g</span>
+        </div>
+        <div class="range-wrap">
+          <input type="range" min="0" max="100" value="42" class="sd-range" id="sensRange" aria-label="Sensitivity" />
+        </div>
+        <div class="range-labels"><span>Butterfly landing</span><span>Full commitment</span></div>
+      </div>
+
+      <div class="dial">
+        <div class="dial-head">
+          <span class="label">Cooldown</span>
+          <span class="value" id="cdVal">1.0s</span>
+        </div>
+        <div class="range-wrap">
+          <input type="range" min="0" max="100" value="55" class="sd-range" id="cdRange" aria-label="Cooldown" />
+        </div>
+        <div class="range-labels"><span>Rapid-fire heckling</span><span>Dramatic pauses</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NINE MOODS ============ -->
+<section class="section" style="background:var(--bg-2);">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Voice packs</span>
+      <h2>Nine moods of protest</h2>
+      <p>150+ sound clips across 9 voice packs. Your open-plan office will have questions.</p>
+    </div>
+    <div class="sound-grid reveal-stagger">
+      <div class="sound-card"><span class="sound-emoji">🙋‍♀️</span><span class="sound-name">Woman</span><span class="sound-desc">Theatrical. Affronted. Will sigh.</span></div>
+      <div class="sound-card"><span class="sound-emoji">🧔</span><span class="sound-name">Man</span><span class="sound-desc">A guy who didn't deserve this.</span></div>
+      <div class="sound-card"><span class="sound-emoji">🐐</span><span class="sound-name">Goat</span><span class="sound-desc">Disrespectful. Resonant. Iconic.</span></div>
+      <div class="sound-card"><span class="sound-emoji">🐱</span><span class="sound-name">Cat</span><span class="sound-desc">Yowls of betrayal, on demand.</span></div>
+      <div class="sound-card"><span class="sound-emoji">🐶</span><span class="sound-name">Dog</span><span class="sound-desc">Yelps with surprising range.</span></div>
+      <div class="sound-card"><span class="sound-emoji">🤖</span><span class="sound-name">Robot</span><span class="sound-desc">Glitchy distress. Buy more RAM.</span></div>
+      <div class="sound-card"><span class="sound-emoji">👶</span><span class="sound-name">Baby</span><span class="sound-desc">Use sparingly. Or maliciously.</span></div>
+      <div class="sound-card"><span class="sound-emoji">👻</span><span class="sound-name">Ghost</span><span class="sound-desc">Wails from the laptop afterlife.</span></div>
+      <div class="sound-card"><span class="sound-emoji">⛩️</span><span class="sound-name">Anime</span><span class="sound-desc">"NANI?!" with appropriate volume.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROADMAP ============ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">What's coming</span>
+      <h2>Roadmap 🗺️</h2>
+      <p>Working on it. Probably. Definitely.</p>
+    </div>
+
+    <div class="roadmap-wrap reveal">
+      <div class="timeline">
+        <div class="tl-item done">
+          <span class="tl-dot">✓</span>
+          <div class="tl-head">
+            <span class="tl-title">Custom Sound Packs</span>
+            <span class="tl-meta">v1.5 · coming soon</span>
+          </div>
+          <p class="tl-desc">Record your own voice, your cat, your boss — whatever you want your MacBook to scream when assaulted.</p>
+        </div>
+        <div class="tl-item locked">
+          <span class="tl-dot">🔒</span>
+          <div class="tl-head">
+            <span class="tl-title">Anti-Theft Mode</span>
+            <span class="tl-meta">coming later</span>
+          </div>
+          <p class="tl-desc">Motion-triggered alarm with Selfie of Shame, auto-arm on screen lock, Touch ID to disarm. (Coming Soon.)</p>
+        </div>
+        <div class="tl-item locked">
+          <span class="tl-dot">📱</span>
+          <div class="tl-head">
+            <span class="tl-title">iOS Version</span>
+            <span class="tl-meta">ios app</span>
+          </div>
+          <p class="tl-desc">Same energy, pocket-sized. Slap your iPhone and it fights back. The cycle continues.</p>
+        </div>
+      </div>
+
+      <aside class="past-releases">
+        <h4>Past releases</h4>
+        <ul>
+          <li><span class="ver">v1.3.0</span><span class="desc">Cooldown timer + nine voice packs</span></li>
+          <li><span class="ver">v1.2.0</span><span class="desc">USB Moaner shipped, against legal advice</span></li>
+          <li><span class="ver">v1.0.16</span><span class="desc">Better detection on M3 Max chassis</span></li>
+          <li><span class="ver">v1.0.15</span><span class="desc">Fixed false-positives during sneezes</span></li>
+          <li><span class="ver">v1.0.14</span><span class="desc">Lifetime slap counter</span></li>
+          <li><span class="ver">v1.0.13</span><span class="desc">Onboarding flow + sensitivity preset</span></li>
+          <li><span class="ver">v1.0.9</span><span class="desc">First public release. Sorry.</span></li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NERDY TECH ============ -->
+<section class="section" style="background:var(--bg-2);">
+  <div class="container" style="max-width:920px;">
+    <details class="collapse reveal" id="nerdyDetails">
+      <summary>
+        <span style="display:inline-flex;align-items:center;gap:12px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          Nerdy tech details
+        </span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </summary>
+      <div class="collapse-body">
+        <div class="nerdy-head">
+          <h3>Wildly overengineered slap detection</h3>
+          <p>Five concurrent accelerometer algorithms vote on whether what just happened was, in fact, a slap. Because one algorithm is for cowards.</p>
+        </div>
+        <div class="algo-grid">
+          <div class="algo">
+            <h4>High-Pass Filter <span class="pill">A1</span></h4>
+            <p>Strips out gravity so we only see the impacts — not your hand resting on the trackpad.</p>
+          </div>
+          <div class="algo">
+            <h4>STA/LTA Ratio <span class="pill">A2</span></h4>
+            <p>Compares short-term vs long-term averages at three timescales. Borrowed from seismology, used for vengeance.</p>
+          </div>
+          <div class="algo">
+            <h4>CUSUM <span class="pill">A3</span></h4>
+            <p>Detects sudden shifts in acceleration. Good at catching slaps that ramp in from a sneaky angle.</p>
+          </div>
+          <div class="algo">
+            <h4>Kurtosis <span class="pill">A4</span></h4>
+            <p>4th statistical moment — finds sharp spikes against a calm baseline. Math, doing math things.</p>
+          </div>
+          <div class="algo">
+            <h4>Peak / MAD <span class="pill">A5</span></h4>
+            <p>Median Absolute Deviation outlier detection. The bouncer at the door of the slap algorithm club.</p>
+          </div>
+          <div class="algo" style="background:var(--grad-soft); border-color:transparent;">
+            <h4 style="color:var(--red)">Quorum vote</h4>
+            <p>When enough of the five algorithms agree → sound plays. Otherwise, you were just being weird.</p>
+          </div>
+        </div>
+        <div class="algo-foot">When enough algorithms agree → <b>sound plays</b></div>
+
+        <div class="code-block" aria-label="SwiftUI architecture">
+          <div class="code-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="file">SlapDash · architecture.swift</span>
+          </div>
+<pre class="code"><span class="code-cmt">// SlapDash — runtime composition</span>
+<span class="code-key">App</span> {
+  <span class="code-cls">MenuBarScene</span> {
+    <span class="code-cls">SlapMenu</span>(state: <span class="code-fn">$state</span>)
+      .<span class="code-fn">onAppear</span> { <span class="code-fn">Detector.start</span>() }
+  }
+
+  <span class="code-cls">Detector</span> {
+    <span class="code-cls">CMMotionManager</span> @ <span class="code-str">200Hz</span>
+      ├─ <span class="code-fn">HighPass</span>()         <span class="code-cmt">// strip gravity</span>
+      ├─ <span class="code-fn">STALTA</span>(windows: [<span class="code-str">5</span>, <span class="code-str">20</span>, <span class="code-str">80</span>])
+      ├─ <span class="code-fn">CUSUM</span>(k: <span class="code-str">0.05</span>, h: <span class="code-str">8</span>)
+      ├─ <span class="code-fn">Kurtosis</span>(window: <span class="code-str">32</span>)
+      └─ <span class="code-fn">PeakMAD</span>(z: <span class="code-str">5.5</span>)
+
+    <span class="code-cls">Quorum</span>(agree: <span class="code-str">3</span> <span class="code-key">of</span> <span class="code-str">5</span>, within: <span class="code-str">40ms</span>)
+      → <span class="code-cls">Player</span>.<span class="code-fn">play</span>(pack: state.pack,
+                       gain: <span class="code-fn">map</span>(force, <span class="code-str">0</span>...<span class="code-str">1</span>))
+      → <span class="code-cls">Cooldown</span>(state.cooldown)
+  }
+}
+</pre>
+        </div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="section" id="download">
+  <div class="container">
+    <div class="pricing-band reveal">
+      <button class="pricing-close" onclick="history.back()" aria-label="Go back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+      <span class="pricing-banner">100% Free · No credit card · No catch</span>
+      <h2>Free. Yes, actually free.</h2>
+      <p class="pricing-sub">Requires an M1PRO+ MacBook running macOS 14.6 Sonoma or later. No credit card. No catch. Just consequences.</p>
+      <div class="pricing-cta">
+        <a href="./Slapdash-1.0.0.dmg" download class="btn btn-lg" target="_blank" rel="noopener noreferrer">
+          <img class="pricing-apple-icon" src="./apple-black-logo.png" width="18" height="18" alt="" style="display:block; object-fit:contain;">
+          Download for Mac
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="section" style="background:var(--bg-2);">
+  <div class="container">
+    <div class="section-head reveal" style="margin-inline:auto; text-align:center;">
+      <span class="eyebrow" style="margin-inline:auto;">Frequently asked</span>
+      <h2>Questions, answered</h2>
+    </div>
+    <div class="faq-list reveal-stagger">
+      <details class="faq-item">
+        <summary>Wait, is SlapDash a security app?
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="faq-body">No. It's a therapy app. For your laptop.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Will I void my MacBook warranty?
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="faq-body">Probably not. We're not lawyers, though, so apply judgment proportional to the value of the object you are about to strike.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Does it work on Intel Macs?
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="faq-body">No. M1 Pro or better only. The accelerometer plumbing we need just isn't there.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I add my own sounds?
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="faq-body">Yes! Coming in v1.5. Record anything: your voice, your dog, your manager during standup.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Does it drain my battery?
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="faq-body">Barely. Less than your existential dread, less than one Chrome tab.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Will it trigger during normal typing?
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="faq-body">No. It only fires on sharp impacts. That's what the five algorithms are for — they agree on what counts as a real slap.</div>
+      </details>
+      <details class="faq-item">
+        <summary>It's free. Do I still get a refund?
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="faq-body">You downloaded a free app and you want your money back? Bold. We respect it. There's nothing to refund. Go slap your laptop.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Wait… it's actually free?
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="faq-body">Yes. Free. No subscription. No "premium tier". No catching feelings. Just download it, slap your Mac, and go live your life.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Is there a Windows version?
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="faq-body">No. Windows users deserve their own suffering.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a href="#top" class="sd-logo">
+          <span class="sd-mark" aria-hidden="true">
+            <img src="./slapdashicon.png" width="36" height="36" alt="SlapDash logo" style="display:block; width:36px; height:36px; object-fit:contain;">
+          </span>
+          <span class="sd-word">SlapDash</span>
+        </a>
+        <p class="footer-tag">A small Mac menu bar app for people who occasionally want to hit their laptop and be heard.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="#" data-modal-title="Creator Discount" data-modal-body="Make a reel about SlapDash, tag us on Instagram, and DM us the link. We'll hook you up.">Creator Discount</a>
+        <a href="#" data-modal-title="Privacy Policy" data-modal-body="SlapDash collects nothing. No accounts. No analytics. No data leaves your Mac. It just screams. That's it.">Privacy</a>
+        <a href="#" data-modal-title="Terms of Use" data-modal-body="Don't use SlapDash to disturb others in public. Don't blame us if your coworkers stare. Use responsibly. Or don't. We're a slap app, not lawyers.">Terms</a>
+        <span class="footer-builtby">Built by <a href="https://www.instagram.com/_chetan_pujari_/?hl=en" target="_blank" rel="noopener noreferrer">Chetan Pujari</a></span>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 SlapDash. All rights reserved.</span>
+      <span class="built">
+        <span>© 2026 Chetan Pujari. Making Tech Simple, One Course at a Time. ⚡</span>
+        <span>Built with ❤️ by <a class="built-link" href="https://chetan-website-delta.vercel.app/" target="_blank" rel="noopener noreferrer">Chetan Pujari</a></span>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // -------- Theme toggle (in-memory only) --------
+  const root = document.documentElement;
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const cur = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  });
+
+  // -------- Nav scrolled state --------
+  const nav = document.getElementById('nav');
+  const onScroll = () => {
+    if (window.scrollY > 8) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  };
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // -------- Lucide icons --------
+  if (window.lucide) { window.lucide.createIcons(); }
+
+  // -------- Sliders --------
+  function setupRange(rangeId, valueId, format) {
+    const r = document.getElementById(rangeId);
+    const v = document.getElementById(valueId);
+    function paint() {
+      const pct = ((+r.value - r.min) / (r.max - r.min)) * 100;
+      r.style.setProperty('--progress', pct + '%');
+      v.textContent = format(+r.value);
+    }
+    r.addEventListener('input', paint);
+    paint();
+  }
+  setupRange('sensRange', 'sensVal', v => {
+    const g = 0.010 + (v / 100) * (0.500 - 0.010);
+    return g.toFixed(3) + 'g';
+  });
+  setupRange('cdRange', 'cdVal', v => {
+    const s = 0.2 + (v / 100) * (3.0 - 0.2);
+    return s.toFixed(1) + 's';
+  });
+
+  // -------- Scroll reveals --------
+  const io = new IntersectionObserver(entries => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  const revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
+  revealEls.forEach(el => io.observe(el));
+  function revealInViewport() {
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    revealEls.forEach(el => {
+      if (el.classList.contains('in')) return;
+      const r = el.getBoundingClientRect();
+      if (r.top < vh * 0.95 && r.bottom > 0) {
+        el.classList.add('in');
+        io.unobserve(el);
+      }
+    });
+  }
+  requestAnimationFrame(revealInViewport);
+  setTimeout(revealInViewport, 250);
+  setTimeout(() => {
+    revealEls.forEach(el => { if (!el.classList.contains('in')) el.classList.add('in'); });
+  }, 1500);
+
+  // ── Hero SFX on click ──────────────────────────────────────────
+  (function () {
+    const sfxFiles = [
+      './sexy SFX/00.mp3',
+      './sexy SFX/01.mp3',
+      './sexy SFX/02.mp3',
+      './sexy SFX/03.mp3'
+    ];
+
+    let lastIndex = -1;
+    let currentAudio = null;
+
+    function playRandomSFX() {
+      if (sfxFiles.length === 0) return;
+
+      let index;
+      do {
+        index = Math.floor(Math.random() * sfxFiles.length);
+      } while (index === lastIndex && sfxFiles.length > 1);
+      lastIndex = index;
+
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+
+      currentAudio = new Audio(sfxFiles[index]);
+      currentAudio.volume = 1.0;
+      currentAudio.loop = false;
+      currentAudio.play().catch(() => {});
+    }
+
+    function triggerShake() {
+      const laptopGrp = document.querySelector('.laptop-grp');
+      if (!laptopGrp) return;
+      laptopGrp.style.animation = 'none';
+      laptopGrp.offsetHeight; // force reflow
+      laptopGrp.style.animation = '';
+    }
+
+    const heroSection = document.querySelector('.hero');
+    if (heroSection) {
+      heroSection.style.cursor = 'pointer';
+      heroSection.addEventListener('click', function () {
+        playRandomSFX();
+        triggerShake();
+      });
+    }
+  })();
+
+  // -------- Footer modal (Creator Discount / Privacy / Terms) --------
+  (function () {
+    const overlay = document.getElementById('footer-modal');
+    if (!overlay) return;
+    const titleEl = overlay.querySelector('.modal-title');
+    const bodyEl = overlay.querySelector('.modal-body');
+    const closeBtn = overlay.querySelector('.modal-close');
+
+    function openModal(title, body) {
+      titleEl.textContent = title;
+      bodyEl.textContent = body;
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.footer-links a[data-modal-title]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal(link.dataset.modalTitle, link.dataset.modalBody);
+      });
+    });
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+    });
+  })();
+</script>
+
+<div class="modal-overlay" id="footer-modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="footer-modal-title">
+    <button class="modal-close" aria-label="Close">&times;</button>
+    <h3 class="modal-title" id="footer-modal-title"></h3>
+    <p class="modal-body"></p>
+  </div>
+</div>
+</body>
+</html>
