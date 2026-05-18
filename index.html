@@ -140,6 +140,39 @@
   html[data-theme="dark"] .icon-moon { display: none; }
   html[data-theme="dark"] .icon-sun { display: block; }
 
+  /* ===== Ko-fi button ===== */
+  .btn-kofi {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 40px; padding: 0 16px; border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: transparent; color: var(--ink);
+    font-family: 'Satoshi', sans-serif; font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease,
+                color .2s ease, transform .15s ease;
+    white-space: nowrap;
+  }
+  .btn-kofi:hover {
+    background: var(--bg-2);
+    border-color: var(--red);
+    color: var(--red);
+    transform: translateY(-1px);
+  }
+  .btn-kofi svg { width: 16px; height: 16px; }
+  .btn-kofi-text { display: inline; }
+  @media (max-width: 640px) {
+    .btn-kofi { padding: 0 12px; }
+    .btn-kofi-text { display: none; }
+  }
+  .footer-kofi {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--ink-2); font-size: 14px;
+    transition: color .15s ease;
+  }
+  .footer-kofi:hover { color: var(--red); }
+  .footer-kofi svg { width: 14px; height: 14px; }
+
   /* ===== Hero ===== */
   .hero { padding: clamp(40px, 7vw, 90px) 0 clamp(60px, 10vw, 120px); position: relative; }
   .hero-grid {
@@ -803,6 +836,10 @@
       <span class="sd-word">SlapDash</span>
     </a>
     <div class="nav-right">
+      <a href="https://ko-fi.com/G2V81ZSGSM" target="_blank" rel="noopener noreferrer" class="btn-kofi" aria-label="Support on Ko-fi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        <span class="btn-kofi-text">Support</span>
+      </a>
       <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg class="icon-sun"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -1342,6 +1379,10 @@
         <a href="#" data-modal-title="Creator Discount" data-modal-body="Make a reel about SlapDash, tag us on Instagram, and DM us the link. We'll hook you up.">Creator Discount</a>
         <a href="#" data-modal-title="Privacy Policy" data-modal-body="SlapDash collects nothing. No accounts. No analytics. No data leaves your Mac. It just screams. That's it.">Privacy</a>
         <a href="#" data-modal-title="Terms of Use" data-modal-body="Don't use SlapDash to disturb others in public. Don't blame us if your coworkers stare. Use responsibly. Or don't. We're a slap app, not lawyers.">Terms</a>
+        <a href="https://ko-fi.com/G2V81ZSGSM" target="_blank" rel="noopener noreferrer" class="footer-kofi" aria-label="Support on Ko-fi">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          Support on Ko-fi
+        </a>
         <span class="footer-builtby">Built by <a href="https://www.instagram.com/_chetan_pujari_/?hl=en" target="_blank" rel="noopener noreferrer">Chetan Pujari</a></span>
       </nav>
     </div>
