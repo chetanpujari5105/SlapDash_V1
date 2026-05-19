@@ -165,14 +165,130 @@
     .btn-kofi { padding: 0 12px; }
     .btn-kofi-text { display: none; }
   }
-  .footer-kofi {
-    display: inline-flex; align-items: center; gap: 8px;
-    color: var(--ink-2); font-size: 14px;
-    transition: color .15s ease;
+  .footer-support-row {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-top: 18px;
+    justify-content: flex-end;
   }
-  .footer-kofi:hover { color: var(--red); }
-  .footer-kofi svg { width: 14px; height: 14px; }
+  @media (max-width: 720px) {
+    .footer-support-row { justify-content: flex-start; }
+  }
+  .footer-kofi, .footer-gumroad {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 4px 18px 4px 4px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--ink); font-size: 14px;
+    font-weight: 700;
+    transition: background .2s ease, border-color .2s ease,
+                color .2s ease, transform .15s ease;
+  }
+  .footer-kofi:hover {
+    background: var(--bg-2);
+    border-color: var(--red);
+    color: var(--red);
+    transform: translateY(-1px);
+  }
+  .footer-gumroad:hover {
+    background: var(--bg-2);
+    border-color: #FF90E8;
+    color: #FF90E8;
+    transform: translateY(-1px);
+  }
+  .footer-kofi svg {
+    width: 22px; height: 22px;
+    margin-left: 8px;
+  }
+  .footer-gumroad img {
+    width: 36px; height: 36px;
+    display: block;
+    object-fit: contain;
+    border-radius: 999px;
+  }
 
+  /* ===== Gumroad button ===== */
+  .btn-gumroad {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 40px; padding: 0 4px 0 2px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--ink);
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 700; font-size: 14px;
+    cursor: pointer;
+    transition: background .2s ease, border-color .2s ease,
+                color .2s ease, transform .15s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .btn-gumroad:hover {
+    background: var(--bg-2);
+    border-color: #FF90E8;
+    color: #FF90E8;
+    transform: translateY(-1px);
+  }
+  .btn-gumroad img {
+    width: 36px; height: 36px;
+    display: block;
+    object-fit: contain;
+    border-radius: 999px;
+  }
+  .btn-gumroad-text {
+    display: inline;
+    padding-right: 10px;
+  }
+  @media (max-width: 640px) {
+    .btn-gumroad { padding: 0 4px; }
+    .btn-gumroad-text { display: none; }
+    .btn-gumroad { padding-right: 4px; }
+  }
+  .btn-gumroad::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    background: var(--ink);
+    color: var(--bg);
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+    z-index: 100;
+    box-shadow: 0 8px 20px -8px rgba(0,0,0,.3);
+  }
+  .btn-gumroad::before {
+    content: '';
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid var(--ink);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+    z-index: 100;
+  }
+  .btn-gumroad:hover::after,
+  .btn-gumroad:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  @media (max-width: 640px) {
+    .btn-gumroad:hover::after,
+    .btn-gumroad:hover::before { opacity: 0; }
+  }
   /* ===== Hero ===== */
   .hero { padding: clamp(40px, 7vw, 90px) 0 clamp(60px, 10vw, 120px); position: relative; }
   .hero-grid {
@@ -703,7 +819,21 @@
   }
   .footer-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; align-items: start; }
   .footer-tag { color: var(--ink-3); margin-top: 14px; max-width: 36ch; font-size: 14px; }
-  .footer-links { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; }
+  .footer-right-col {
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 4px;
+  }
+  @media (max-width: 720px) {
+    .footer-right-col { align-items: flex-start; }
+  }
+  .footer-links {
+    display: flex; flex-wrap: wrap;
+    gap: 8px 22px; font-size: 14px;
+    justify-content: flex-end;
+  }
+  @media (max-width: 720px) {
+    .footer-links { justify-content: flex-start; }
+  }
   .footer-links a { color: var(--ink-2); transition: color .15s ease; }
   .footer-links a:hover { color: var(--red); }
   .footer-bottom {
@@ -836,6 +966,10 @@
       <span class="sd-word">SlapDash</span>
     </a>
     <div class="nav-right">
+      <a href="https://chetanpujari92.gumroad.com/l/SlapDashChetan" target="_blank" rel="noopener noreferrer" class="btn-gumroad" aria-label="Get the source code on Gumroad" data-tooltip="Get the source code on Gumroad">
+        <img src="./gumroad.png" alt="Gumroad" />
+        <span class="btn-gumroad-text">Source Code</span>
+      </a>
       <a href="https://ko-fi.com/G2V81ZSGSM" target="_blank" rel="noopener noreferrer" class="btn-kofi" aria-label="Support on Ko-fi">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
         <span class="btn-kofi-text">Support</span>
@@ -1375,21 +1509,28 @@
         </a>
         <p class="footer-tag">A small Mac menu bar app for people who occasionally want to hit their laptop and be heard.</p>
       </div>
-      <nav class="footer-links" aria-label="Footer">
-        <a href="#" data-modal-title="Creator Discount" data-modal-body="Make a reel about SlapDash, tag us on Instagram, and DM us the link. We'll hook you up.">Creator Discount</a>
-        <a href="#" data-modal-title="Privacy Policy" data-modal-body="SlapDash collects nothing. No accounts. No analytics. No data leaves your Mac. It just screams. That's it.">Privacy</a>
-        <a href="#" data-modal-title="Terms of Use" data-modal-body="Don't use SlapDash to disturb others in public. Don't blame us if your coworkers stare. Use responsibly. Or don't. We're a slap app, not lawyers.">Terms</a>
-        <a href="https://ko-fi.com/G2V81ZSGSM" target="_blank" rel="noopener noreferrer" class="footer-kofi" aria-label="Support on Ko-fi">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-          Support on Ko-fi
-        </a>
-        <span class="footer-builtby">Built by <a href="https://www.instagram.com/_chetan_pujari_/?hl=en" target="_blank" rel="noopener noreferrer">Chetan Pujari</a></span>
-      </nav>
+      <div class="footer-right-col">
+        <nav class="footer-links" aria-label="Footer">
+          <a href="#" data-modal-title="Creator Discount" data-modal-body="Make a reel about SlapDash, tag us on Instagram, and DM us the link. We'll hook you up.">Creator Discount</a>
+          <a href="#" data-modal-title="Privacy Policy" data-modal-body="SlapDash collects nothing. No accounts. No analytics. No data leaves your Mac. It just screams. That's it.">Privacy</a>
+          <a href="#" data-modal-title="Terms of Use" data-modal-body="Don't use SlapDash to disturb others in public. Don't blame us if your coworkers stare. Use responsibly. Or don't. We're a slap app, not lawyers.">Terms</a>
+        </nav>
+        <div class="footer-support-row">
+          <a href="https://ko-fi.com/G2V81ZSGSM" target="_blank" rel="noopener noreferrer" class="footer-kofi" aria-label="Support on Ko-fi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            Support on Ko-fi
+          </a>
+          <a href="https://chetanpujari92.gumroad.com/l/SlapDashChetan" target="_blank" rel="noopener noreferrer" class="footer-gumroad" aria-label="Get the source code on Gumroad">
+            <img src="./gumroad.png" alt="Gumroad" />
+            Get the source code
+          </a>
+        </div>
+      </div>
     </div>
     <div class="footer-bottom">
       <span>© 2026 SlapDash. All rights reserved.</span>
       <span class="built">
-        <span>© 2026 Chetan Pujari. Making Tech Simple, One Course at a Time. ⚡</span>
+        <span>Making Tech Simple, One Course at a Time. ⚡</span>
         <span>Built with ❤️ by <a class="built-link" href="https://chetan-website-delta.vercel.app/" target="_blank" rel="noopener noreferrer">Chetan Pujari</a></span>
       </span>
     </div>
